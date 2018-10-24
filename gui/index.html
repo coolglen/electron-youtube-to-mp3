@@ -20,8 +20,11 @@
           <button type="button" class="close" v-on:click="error = ''" data-dismiss="alert">&times;</button>
           {{error}}
         </div>
+        <div class="loading-gif">
+          <img src="./assets/loader.gif" alt="loading-gif" v-if="loading">
+        </div>
 
-      <div class="input-group mb-3 url-input">
+      <div class="input-group mb-3 url-input" v-if="!loading">
         <input type="text" class="form-control" v-model="url" placeholder="Url" aria-label="Url" aria-describedby="button-addon">
         <div class="input-group-append">
           <button class="btn btn-outline-secondary" v-on:click="addItem()" type="button" id="button-addon">Add</button>
@@ -33,14 +36,25 @@
       <div class="video-list-container scrollable">
 
         <!-- video Item -->
-         <div class="video-item">
-           <img src="https://i.ytimg.com/vi/WyaySJof18o/default.jpg" alt="" class="img-thumbnail m-0.5">
+         <div class="video-item" v-for="item in videoList">
+           <img :src="item.snippet.thumbnails.default.url" alt="" class="img-thumbnail m-0.5">
            <div class="details ml-2">
-             <span class="title">An American Vegan Doesn't Understand Australia</span>
-             <span class="duration">Duration: 13:37</span>
+             <div class="title">{{item.snippet.title}}</div>
+             <div class="duration">Duration: {{formateDuration(item.contentDetails.duration)}}</div>
+             <div class="status-box mb-1"> <pre>{{convertedVieos}}</pre>
+               <span>Status: </span>
+                <div class="status" v-if="!convertedVideos[item.id]">Not Started.</div>
+               
+                <div class="status" v-if="convertedVideos[item.id]">
+                  <div class="progress">
+                    <div class="progress-bar" role="progressbar"
+                     :style="{width:  Math.round(convertedVideos[item.id].progress) +'%'}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                </div>
+                <div class="controlls"><button v-on:click="convertItem(item)">CONV</button></div>
+             </div>
            </div>
          </div>
-
       </div>
 
     </div>

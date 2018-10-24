@@ -12,16 +12,6 @@ body {
     overflow-y: scroll; 
 }
 
-::-webkit-scrollbar-track {
-    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb {
-    border-radius: 10px;
-    background: red; 
-}
-
 .video-list-container {
     height: 80%;
     background-color: #ffffff;
@@ -39,9 +29,9 @@ body {
 
 .video-item {
     max-width: 100%;
-    max-height: 102px;
+    max-height: 79px;
     min-width: 100%;
-    min-height: 102px;
+    min-height: 79px;
     border-bottom: 1px solid black;
     color: black;
 
@@ -50,18 +40,39 @@ body {
 .video-item img {
     float: left;
     font-size: 8px;
-    height: 95%;
+    width: 15%;
+}
+
+.loading-gif {
+    width: 32px;
+    margin: 0 auto;
 }
 
 .video-item .details{
     float: left;
 }
 
+.video-item .details .status-box{
+    width: 300px;
+    height: 20px;
+}
+
+.video-item .details .status-box span{
+    position: relative;
+    bottom: 3px;
+}
+
+.video-item .details .status{
+    display: inline-block;
+    width: 240px;
+}
+
 .video-item .details .title{
+
     font-weight: 800;
     overflow: hidden;
     white-space: nowrap;
-    max-width: 350px;
+    width: 500px;
 }
 
 .video-item .details .duration {

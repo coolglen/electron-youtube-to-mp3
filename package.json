@@ -14,7 +14,10 @@
     "electron": "^3.0.4"
   },
   "dependencies": {
+    "data-store": "^3.1.0",
+    "fluent-ffmpeg": "^2.1.2",
     "google-auth-library": "^2.0.0",
-    "googleapis": "^34.0.0"
+    "googleapis": "^34.0.0",
+    "youtube-mp3-downloader": "^0.5.3"
   }
 }
