@@ -5,7 +5,7 @@ function dataStore(){
     this.data = 0;
     this.getOutputPath = () => {
         let output = store.get('converter.output');
-        return (output && output != '') ? output : `C:/Users/${require("os").userInfo().username}/Music`;
+        return output || `C:/Users/${require("os").userInfo().username}/Music`;
     };
 
     this.getQuality = () => {

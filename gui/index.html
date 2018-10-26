@@ -17,12 +17,12 @@
 
       <!-- error panel -->
       <div class="alert alert-dismissible alert-danger" v-if="error">
-          <button type="button" class="close" v-on:click="error = ''" data-dismiss="alert">&times;</button>
-          {{error}}
-        </div>
-        <div class="loading-gif">
-          <img src="./assets/loader.gif" alt="loading-gif" v-if="loading">
-        </div>
+        <button type="button" class="close" v-on:click="error = ''" data-dismiss="alert">&times;</button>
+        {{error}}
+      </div>
+      <div class="loading-gif">
+        <img src="./assets/loader.gif" alt="loading-gif" v-if="loading">
+      </div>
 
       <div class="input-group mb-3 url-input" v-if="!loading">
         <input type="text" class="form-control" v-model="url" placeholder="Url" aria-label="Url" aria-describedby="button-addon">
@@ -33,28 +33,63 @@
 
 
       <!-- videoList -->
-      <div class="video-list-container scrollable">
+      <div class="video-list-container scrollable mb-2">
 
         <!-- video Item -->
-         <div class="video-item" v-for="item in videoList">
-           <img :src="item.snippet.thumbnails.default.url" alt="" class="img-thumbnail m-0.5">
-           <div class="details ml-2">
-             <div class="title">{{item.snippet.title}}</div>
-             <div class="duration">Duration: {{formateDuration(item.contentDetails.duration)}}</div>
-             <div class="status-box mb-1"> <pre>{{convertedVieos}}</pre>
-               <span>Status: </span>
-                <div class="status" v-if="!convertedVideos[item.id]">Not Started.</div>
-               
-                <div class="status" v-if="convertedVideos[item.id]">
+        <div class="video-item" v-for="item in videoList">
+          <img :src="item.snippet.thumbnails.default.url" alt="" class="img-thumbnail m-0.5">
+          <div class="details ml-2">
+            <div class="title">{{item.snippet.title}}</div>
+            <div class="duration">Duration: {{formateDuration(item.contentDetails.duration)}}</div>
+
+
+            <div class="bottom-details">
+
+              <div class="status-box mb-1">
+                <span>Status: </span>
+                <div class="status" v-if="!convertedVideos[item.id]">
+                  Not Started.
+                </div>
+                <div class="status" v-if="convertedVideos[item.id] && convertedVideos[item.id].starting">
+                  Waiting...
+                </div>
+                <div class="status" v-if="convertedVideos[item.id] && convertedVideos[item.id].stats">
+                    Complete.
+                  </div>
+
+                <div class="status" v-if="convertedVideos[item.id] && convertedVideos[item.id].percentage">
                   <div class="progress">
-                    <div class="progress-bar" role="progressbar"
-                     :style="{width:  Math.round(convertedVideos[item.id].progress) +'%'}" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar" role="progressbar" :style="{width:  Math.round(convertedVideos[item.id].percentage) +'%'}"
+                      aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
                   </div>
                 </div>
-                <div class="controlls"><button v-on:click="convertItem(item)">CONV</button></div>
-             </div>
-           </div>
-         </div>
+
+              </div>
+              <div class="controls">
+                <button type="button" class="btn btn-success" v-if="convertedVideos[item.id] && convertedVideos[item.id].stats"
+                  v-on:click="openVideo(item)">Open</button>
+                <button type="button" v-if="!convertedVideos[item.id]" class="btn btn-success" v-on:click="convertItem(item)">Convert</button>
+                <button type="button" v-if="!convertedVideos[item.id] || convertedVideos[item.id].stats" class="btn btn-danger" v-on:click="removeItem(item)">Remove</button>
+                
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <label for="outputPath">Output Path</label>
+      <div class="input-group mb-3">
+        <input type="text" id="outputPath" class="form-control" v-model="outputPath" placeholder="Output Path"
+          aria-label="Output Path" aria-describedby="button-addon2" readonly>
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" id="button-addon2" v-on:click="setOutputPath()">Browse</button>
+        </div>
+        <div class="input-group-append">
+          <button class="btn btn-outline-secondary" type="button" id="button-addon2" v-on:click="openOutputPath()">Open</button>
+        </div>
       </div>
 
     </div>

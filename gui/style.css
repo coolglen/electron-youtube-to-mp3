@@ -1,15 +1,14 @@
-
 body {
     background-color: #22333B;
     height: 90vh;
 }
 
-.url-input button{
+.url-input button {
     background-color: #8EDCE6;
 }
 
 .scrollable {
-    overflow-y: scroll; 
+    overflow-y: scroll;
 }
 
 .video-list-container {
@@ -48,26 +47,26 @@ body {
     margin: 0 auto;
 }
 
-.video-item .details{
-    float: left;
-}
+.video-item .details {}
 
-.video-item .details .status-box{
-    width: 300px;
+.video-item .details .status-box {
+    display: inline-block;
+    width: 340px;
     height: 20px;
 }
 
-.video-item .details .status-box span{
-    position: relative;
-    bottom: 3px;
-}
+.video-item .details .status-box span {}
 
-.video-item .details .status{
+.video-item .details .status {
     display: inline-block;
-    width: 240px;
 }
 
-.video-item .details .title{
+.video-item .details .status .progress {
+    height: 10px;
+    width: 150px;
+}
+
+.video-item .details .title {
 
     font-weight: 800;
     overflow: hidden;
@@ -77,4 +76,17 @@ body {
 
 .video-item .details .duration {
     display: block;
+}
+
+.video-item .controls {
+    display: inline-block;
+}
+
+.video-item .controls button {
+    position: relative;
+    bottom: 10px;
+}
+
+#outputPath {
+    background-color: #ffffff;
 }

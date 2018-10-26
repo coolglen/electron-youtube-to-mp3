@@ -77,7 +77,41 @@ function YoutubeApi(apiFile = "./api/api_key.json") {
             id: id,
             part: part
         });
-    }
+    },
+
+    this.getPlaylistDataById = (id) =>{
+        return new Promise((resolve, reject) => {
+            this.getPlaylistPage(id).then( async(result) => {
+                let results = result;
+                for(let r in results){
+                    let contentDetails = await this.getVideoById(results[r].snippet.resourceId.videoId, 'contentDetails').then(resp => {
+                        return resp.items[0].contentDetails;
+                    });
+                    results[r].contentDetails = contentDetails;
+                }
+                resolve(results)
+            });
+        });
+    },
+
+    this.getPlaylistPage = (id, results, nextPage) => {
+        return this.apiQuery('playlistItems', {
+            playlistId: id,
+            part: 'snippet',
+            maxResults:50,
+            pageToken: nextPage || ''
+        }).then(res => {
+            const page = res.nextPageToken;
+            
+            let newResults = results || [];
+            newResults = [...newResults, ...res.items]
+            if(page){
+                return this.getPlaylistPage(id, newResults, page);
+            }
+            return newResults;
+        });
+    },
+
     this.init();
 }
 

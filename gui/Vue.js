@@ -1,14 +1,19 @@
 const urlHandler = require('../utils/urlHandler');
 const api = require('../api/YoutubeApi');
 const youtubeConverter = require('../downloader/youtubeConverter');
+const dataStore = require('../utils/data-store');
+
+const {dialog, shell} = require('electron').remote;
+
 
 let app = new Vue({
     el: '#app',
     data: {
         videoList: [],
         convertedVideos: {},
-        loading:  false,
-        url: 'https://www.youtube.com/watch?v=DwfOHNPgjfU',
+        loading: false,
+        outputPath: '',
+        url: '',
         error: ''
     },
     methods: {
@@ -21,20 +26,23 @@ let app = new Vue({
                 return done();
             }
 
-            //this.url = '';
+            this.url = '';
             if (params && params.v) {
                 if ((this.videoList.filter(e => e.id == params.v).length > 0)) {
                     this.error = "That video has already been added.";
                     return done();
                 }
-                this.api.getVideoById(params.v).then(snippet => {
-                    this.api.getVideoById(params.v, 'contentDetails').then(contentDetails => {
-                        snippet.items[0].contentDetails = contentDetails.items[0].contentDetails;
-                        this.videoList.unshift(snippet.items[0]);
-                        console.log(this.videoList);
-                        
-                        return done();
-                    });
+                this.api.getVideoById(params.v, 'contentDetails, snippet').then(resp => {
+                    this.videoList.unshift(resp.items[0]);
+                    return done();
+                });
+            }
+
+            if(params && params.list){
+                this.api.getPlaylistDataById(params.list).then(res => {
+                    this.videoList = [...res, ...this.videoList];
+                    return done();
+                    
                 });
             }
 
@@ -43,18 +51,29 @@ let app = new Vue({
                 return;
             };
         },
+        removeItem(item){
+            this.videoList.splice(this.videoList.indexOf(item), 1);
+            delete this.convertedVideos[item.id];
+        },
 
-        convertItem(item){
+        convertItem(item) {
+            console.log('converting: '+ item);
+            this.convertedVideos[item.id] = this.convertedVideos[item.id] || {starting:true};
+            this.$forceUpdate();
+            
             this.youtubeConverter.convert(item.id, (r) => {
-                let data = r.progress || r.finished;
-                
-                
-                 if(data){
-                    this.convertedVideos[data.videoId] = data.progress || data.finished;                 
-                 }   
-                 console.log(this.convertedVideos);
-                 
+               
+                let data = r.progress || r.finished.data;
+                if (data) { 
+                    this.convertedVideos[data.videoId] = data.progress || data;
+                    this.$forceUpdate();
+                }
             });
+        },
+        openVideo(item){
+            console.log(this.convertedVideos[item.id]);
+            shell.showItemInFolder(this.convertedVideos[item.id].file);
+            
         },
 
         formateDuration(duration) {
@@ -76,6 +95,16 @@ let app = new Vue({
                 return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
             };
             return `${hours ? hours + ':' : ''}${minutes ? hours ? pad(minutes, 2) + ':' : minutes + ':' : ''}${pad(seconds, 2)}`;
+        },
+        setOutputPath() {
+            var path = dialog.showOpenDialog({
+                properties: ['openDirectory']
+            });
+            this.outputPath = path;
+            this.dataStore.setOutputPath(path);
+        },
+        openOutputPath(){
+            shell.openItem(this.outputPath[0]);
         }
     },
 
@@ -83,7 +112,10 @@ let app = new Vue({
     mounted() {
         this.urlHandler = new urlHandler();
         this.api = new api();
-        this.youtubeConverter = new youtubeConverter()
+        this.youtubeConverter = new youtubeConverter();
         this.youtubeConverter.createConverter();
+        this.dataStore = new dataStore();
+        this.outputPath = this.dataStore.getOutputPath();
+
     }
 });
